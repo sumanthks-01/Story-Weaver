@@ -10,30 +10,55 @@ function App() {
   const [fullStory, setFullStory] = useState(null);
 
   useEffect(() => {
+    // Test localStorage
+    try {
+      localStorage.setItem('test', 'working');
+      const test = localStorage.getItem('test');
+      console.log('localStorage test:', test);
+      localStorage.removeItem('test');
+    } catch (error) {
+      console.error('localStorage not available:', error);
+    }
+    
     loadStories();
   }, []);
 
   const loadStories = () => {
-    const saved = localStorage.getItem('storyWeaver');
-    if (saved) {
-      setStories(JSON.parse(saved));
+    try {
+      const saved = localStorage.getItem('storyWeaver');
+      if (saved) {
+        const parsedStories = JSON.parse(saved);
+        console.log('Loaded stories:', parsedStories);
+        setStories(parsedStories);
+      }
+    } catch (error) {
+      console.error('Error loading stories:', error);
     }
   };
 
   const saveStories = (updatedStories) => {
-    localStorage.setItem('storyWeaver', JSON.stringify(updatedStories));
-    setStories(updatedStories);
+    try {
+      console.log('Saving stories:', updatedStories);
+      localStorage.setItem('storyWeaver', JSON.stringify(updatedStories));
+      setStories(updatedStories);
+    } catch (error) {
+      console.error('Error saving stories:', error);
+    }
   };
 
   const startNewStory = (firstSentence) => {
-    if (!firstSentence.trim()) return;
+    if (!firstSentence.trim()) {
+      alert('Please enter a sentence to start the story.');
+      return;
+    }
     
     const newStory = {
       id: Date.now(),
-      sentences: [firstSentence],
+      sentences: [firstSentence.trim()],
       createdAt: new Date().toISOString()
     };
     
+    console.log('Creating new story:', newStory);
     const updatedStories = [...stories, newStory];
     saveStories(updatedStories);
     setNewSentence('');
@@ -50,11 +75,15 @@ function App() {
   };
 
   const addSentence = () => {
-    if (!newSentence.trim()) return;
+    if (!newSentence.trim()) {
+      alert('Please enter a sentence.');
+      return;
+    }
     
+    console.log('Adding sentence to story:', currentStory);
     const updatedStories = stories.map(story => 
       story.id === currentStory 
-        ? { ...story, sentences: [...story.sentences, newSentence] }
+        ? { ...story, sentences: [...story.sentences, newSentence.trim()] }
         : story
     );
     

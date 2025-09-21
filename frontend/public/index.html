@@ -4,6 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Story Weaver</title>
+  <script>
+    if (sessionStorage.redirect) {
+      history.replaceState(null, null, sessionStorage.redirect);
+      delete sessionStorage.redirect;
+    }
+  </script>
 </head>
 <body>
   <div id="root"></div>

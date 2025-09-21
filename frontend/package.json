@@ -1,7 +1,7 @@
 {
   "name": "story-weaver-frontend",
   "version": "1.0.0",
-  "homepage": "https://yourusername.github.io/story-weaver",
+  "homepage": "./",
   "private": true,
   "dependencies": {
     "react": "^18.2.0",
