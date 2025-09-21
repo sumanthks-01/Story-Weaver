@@ -1,0 +1,10 @@
+{
+  "name": "story-weaver",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "cd frontend && npm start",
+    "build": "cd frontend && npm run build",
+    "deploy": "cd frontend && npm run deploy",
+    "install-all": "npm install && cd frontend && npm install"
+  }
+}
