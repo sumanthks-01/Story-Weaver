@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/story-weaver/static/css/main.a93b921c.css",
+    "main.js": "/story-weaver/static/js/main.b444ee53.js",
+    "index.html": "/story-weaver/index.html",
+    "main.a93b921c.css.map": "/story-weaver/static/css/main.a93b921c.css.map",
+    "main.b444ee53.js.map": "/story-weaver/static/js/main.b444ee53.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a93b921c.css",
+    "static/js/main.b444ee53.js"
+  ]
+}
