@@ -11,6 +11,19 @@ function App() {
   const [newSentence, setNewSentence] = useState('');
   const [fullStory, setFullStory] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    document.body.className = darkMode ? 'dark-mode' : 'light-mode';
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   useEffect(() => {
     loadStories();
@@ -128,8 +141,15 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1>📖 Story Weaver</h1>
-        <p>Collaborative storytelling, one sentence at a time</p>
+        <div className="header-content">
+          <div className="title-section">
+            <h1>📖 Story Weaver</h1>
+            <p>Collaborative storytelling, one sentence at a time</p>
+          </div>
+          <button className="theme-toggle" onClick={toggleDarkMode}>
+            {darkMode ? '☀️' : '🌙'}
+          </button>
+        </div>
       </header>
 
       {view === 'home' && (
