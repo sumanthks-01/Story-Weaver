@@ -8,25 +8,31 @@ Visit: [https://yourusername.github.io/story-weaver](https://yourusername.github
 
 ## Features
 
+- **Real-time collaboration** - Multiple users can contribute simultaneously
 - Start new collaborative stories
 - Add sentences to existing stories (seeing only the latest sentence)
 - View complete stories
+- **Cloud storage** - Stories are saved in Firebase and accessible to everyone
 - Simple, clean interface
-- Works offline with localStorage
 
 ## Quick Start
 
-1. **Install dependencies:**
+1. **Setup Firebase** (see FIREBASE_SETUP.md for detailed guide):
+   - Create Firebase project
+   - Enable Firestore
+   - Update config in `frontend/src/firebase.js`
+
+2. **Install dependencies:**
    ```bash
    npm run install-all
    ```
 
-2. **Run locally:**
+3. **Run locally:**
    ```bash
    npm run dev
    ```
 
-3. **Deploy to GitHub Pages:**
+4. **Deploy to GitHub Pages:**
    ```bash
    npm run deploy
    ```
@@ -53,13 +59,14 @@ Visit: [https://yourusername.github.io/story-weaver](https://yourusername.github
 2. **Continue Stories**: Select an active story, see only the latest sentence, and add your own
 3. **Read Complete Stories**: View the full collaborative story once it's built up
 
-Stories are saved in your browser's localStorage, so they persist between sessions on the same device.
+Stories are saved in Firebase Firestore, making them accessible to all users in real-time.
 
 ## Tech Stack
 
 - **Frontend**: React
-- **Storage**: localStorage (browser-based)
+- **Database**: Firebase Firestore
 - **Hosting**: GitHub Pages
+- **Real-time**: Firebase real-time updates
 
 ## Files to Ignore (.gitignore)
 

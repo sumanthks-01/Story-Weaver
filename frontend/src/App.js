@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import { db } from './firebase';
+import { collection, addDoc, getDocs, doc, updateDoc, getDoc, orderBy, query } from 'firebase/firestore';
 
 function App() {
   const [view, setView] = useState('home');
@@ -10,93 +12,106 @@ function App() {
   const [fullStory, setFullStory] = useState(null);
 
   useEffect(() => {
-    // Test localStorage
-    try {
-      localStorage.setItem('test', 'working');
-      const test = localStorage.getItem('test');
-      console.log('localStorage test:', test);
-      localStorage.removeItem('test');
-    } catch (error) {
-      console.error('localStorage not available:', error);
-    }
-    
     loadStories();
   }, []);
 
-  const loadStories = () => {
+  const loadStories = async () => {
     try {
-      const saved = localStorage.getItem('storyWeaver');
-      if (saved) {
-        const parsedStories = JSON.parse(saved);
-        console.log('Loaded stories:', parsedStories);
-        setStories(parsedStories);
-      }
+      const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const storiesData = [];
+      querySnapshot.forEach((doc) => {
+        storiesData.push({ id: doc.id, ...doc.data() });
+      });
+      console.log('Loaded stories:', storiesData);
+      setStories(storiesData);
     } catch (error) {
       console.error('Error loading stories:', error);
     }
   };
 
-  const saveStories = (updatedStories) => {
-    try {
-      console.log('Saving stories:', updatedStories);
-      localStorage.setItem('storyWeaver', JSON.stringify(updatedStories));
-      setStories(updatedStories);
-    } catch (error) {
-      console.error('Error saving stories:', error);
-    }
-  };
 
-  const startNewStory = (firstSentence) => {
+
+  const startNewStory = async (firstSentence) => {
     if (!firstSentence.trim()) {
       alert('Please enter a sentence to start the story.');
       return;
     }
     
-    const newStory = {
-      id: Date.now(),
-      sentences: [firstSentence.trim()],
-      createdAt: new Date().toISOString()
-    };
-    
-    console.log('Creating new story:', newStory);
-    const updatedStories = [...stories, newStory];
-    saveStories(updatedStories);
-    setNewSentence('');
-    setView('home');
-  };
-
-  const selectStory = (storyId) => {
-    const story = stories.find(s => s.id === storyId);
-    if (story) {
-      setCurrentStory(storyId);
-      setLatestSentence(story.sentences[story.sentences.length - 1]);
-      setView('contribute');
+    try {
+      const newStory = {
+        sentences: [firstSentence.trim()],
+        createdAt: new Date()
+      };
+      
+      console.log('Creating new story:', newStory);
+      await addDoc(collection(db, 'stories'), newStory);
+      setNewSentence('');
+      setView('home');
+      loadStories();
+    } catch (error) {
+      console.error('Error creating story:', error);
+      alert('Error creating story. Please try again.');
     }
   };
 
-  const addSentence = () => {
+  const selectStory = async (storyId) => {
+    try {
+      const docRef = doc(db, 'stories', storyId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const story = docSnap.data();
+        setCurrentStory(storyId);
+        setLatestSentence(story.sentences[story.sentences.length - 1]);
+        setView('contribute');
+      }
+    } catch (error) {
+      console.error('Error selecting story:', error);
+    }
+  };
+
+  const addSentence = async () => {
     if (!newSentence.trim()) {
       alert('Please enter a sentence.');
       return;
     }
     
-    console.log('Adding sentence to story:', currentStory);
-    const updatedStories = stories.map(story => 
-      story.id === currentStory 
-        ? { ...story, sentences: [...story.sentences, newSentence.trim()] }
-        : story
-    );
-    
-    saveStories(updatedStories);
-    setNewSentence('');
-    setView('home');
+    try {
+      console.log('Adding sentence to story:', currentStory);
+      const docRef = doc(db, 'stories', currentStory);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const story = docSnap.data();
+        const updatedSentences = [...story.sentences, newSentence.trim()];
+        
+        await updateDoc(docRef, {
+          sentences: updatedSentences
+        });
+        
+        setNewSentence('');
+        setView('home');
+        loadStories();
+      }
+    } catch (error) {
+      console.error('Error adding sentence:', error);
+      alert('Error adding sentence. Please try again.');
+    }
   };
 
-  const viewFullStory = (storyId) => {
-    const story = stories.find(s => s.id === storyId);
-    if (story) {
-      setFullStory(story);
-      setView('fullStory');
+  const viewFullStory = async (storyId) => {
+    try {
+      const docRef = doc(db, 'stories', storyId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const story = { id: storyId, ...docSnap.data() };
+        setFullStory(story);
+        setView('fullStory');
+      }
+    } catch (error) {
+      console.error('Error viewing story:', error);
     }
   };
 
@@ -122,7 +137,7 @@ function App() {
             ) : (
               stories.map(story => (
                 <div key={story.id} className="story-card">
-                  <h3>Story #{story.id}</h3>
+                  <h3>Story #{story.id.slice(-6)}</h3>
                   <p>{story.sentences.length} sentences</p>
                   <div className="story-actions">
                     <button onClick={() => selectStory(story.id)}>
@@ -179,7 +194,7 @@ function App() {
 
       {view === 'fullStory' && fullStory && (
         <div className="full-story">
-          <h2>Story #{fullStory.id}</h2>
+          <h2>Story #{fullStory.id.slice(-6)}</h2>
           <div className="story-content">
             {fullStory.sentences.map((sentence, index) => (
               <p key={index}>{sentence}</p>
