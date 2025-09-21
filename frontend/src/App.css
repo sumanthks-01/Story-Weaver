@@ -1,131 +1,287 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
 .App {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
   padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
 }
 
 header {
   text-align: center;
   margin-bottom: 40px;
+  padding: 30px 0;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 header h1 {
   color: #2c3e50;
-  margin-bottom: 10px;
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 header p {
-  color: #7f8c8d;
-  font-size: 18px;
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin: 0;
+  font-weight: 400;
 }
 
 .actions {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   margin-bottom: 30px;
+  justify-content: center;
 }
 
 button {
-  padding: 12px 24px;
+  padding: 14px 28px;
   border: none;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
 }
 
 button.primary {
-  background-color: #3498db;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
 button.primary:hover {
-  background-color: #2980b9;
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
 }
 
 button:not(.primary) {
-  background-color: #ecf0f1;
+  background: rgba(255, 255, 255, 0.9);
   color: #2c3e50;
+  border: 2px solid rgba(108, 117, 125, 0.2);
 }
 
 button:not(.primary):hover {
-  background-color: #d5dbdb;
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(108, 117, 125, 0.3);
+}
+
+.home {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .stories h2 {
   color: #2c3e50;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .story-card {
-  border: 1px solid #bdc3c7;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 15px;
-  background-color: #f8f9fa;
+  border: none;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.story-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
 }
 
 .story-card h3 {
-  margin: 0 0 10px 0;
+  margin: 0 0 12px 0;
   color: #2c3e50;
+  font-size: 1.3rem;
+  font-weight: 600;
 }
 
 .story-card p {
-  margin: 0 0 15px 0;
-  color: #7f8c8d;
+  margin: 0 0 20px 0;
+  color: #6c757d;
+  font-size: 1rem;
 }
 
 .story-actions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .story-actions button {
-  padding: 8px 16px;
+  padding: 10px 20px;
   font-size: 14px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.new-story, .contribute, .full-story {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.new-story h2, .contribute h2, .full-story h2 {
+  color: #2c3e50;
+  margin: 0 0 25px 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .latest-sentence {
-  background-color: #f8f9fa;
-  border-left: 4px solid #3498db;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 2px solid rgba(102, 126, 234, 0.2);
+  padding: 25px;
+  margin-bottom: 25px;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.latest-sentence::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .latest-sentence h3 {
-  margin: 0 0 10px 0;
+  margin: 0 0 15px 0;
   color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .latest-sentence p {
-  font-size: 18px;
+  font-size: 1.2rem;
   font-style: italic;
   color: #2c3e50;
   margin: 0;
+  line-height: 1.6;
+  font-weight: 500;
 }
 
 textarea {
   width: 100%;
-  min-height: 100px;
-  padding: 15px;
-  border: 1px solid #bdc3c7;
-  border-radius: 6px;
+  min-height: 120px;
+  padding: 20px;
+  border: 2px solid rgba(108, 117, 125, 0.2);
+  border-radius: 12px;
   font-size: 16px;
   font-family: inherit;
   resize: vertical;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  background: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s ease;
+  line-height: 1.6;
 }
 
 textarea:focus {
   outline: none;
-  border-color: #3498db;
+  border-color: #667eea;
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+textarea::placeholder {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.story-content {
+  background: rgba(248, 249, 250, 0.8);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 25px;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .story-content p {
-  font-size: 18px;
-  line-height: 1.6;
-  margin-bottom: 15px;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 18px;
   color: #2c3e50;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(108, 117, 125, 0.1);
+}
+
+.story-content p:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .App {
+    padding: 15px;
+  }
+  
+  header {
+    padding: 20px;
+    margin-bottom: 25px;
+  }
+  
+  header h1 {
+    font-size: 2rem;
+  }
+  
+  .story-actions {
+    flex-direction: column;
+  }
+  
+  .story-actions button {
+    min-width: auto;
+  }
+  
+  .actions {
+    flex-direction: column;
+    align-items: center;
+  }
 }

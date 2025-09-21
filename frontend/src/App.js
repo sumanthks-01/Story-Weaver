@@ -10,6 +10,7 @@ function App() {
   const [latestSentence, setLatestSentence] = useState('');
   const [newSentence, setNewSentence] = useState('');
   const [fullStory, setFullStory] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadStories();
@@ -17,6 +18,7 @@ function App() {
 
   const loadStories = async () => {
     try {
+      setLoading(true);
       const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
       const storiesData = [];
@@ -27,6 +29,8 @@ function App() {
       setStories(storiesData);
     } catch (error) {
       console.error('Error loading stories:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,6 +43,7 @@ function App() {
     }
     
     try {
+      setLoading(true);
       const newStory = {
         sentences: [firstSentence.trim()],
         createdAt: new Date()
@@ -48,10 +53,12 @@ function App() {
       await addDoc(collection(db, 'stories'), newStory);
       setNewSentence('');
       setView('home');
-      loadStories();
+      await loadStories();
     } catch (error) {
       console.error('Error creating story:', error);
       alert('Error creating story. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,6 +85,7 @@ function App() {
     }
     
     try {
+      setLoading(true);
       console.log('Adding sentence to story:', currentStory);
       const docRef = doc(db, 'stories', currentStory);
       const docSnap = await getDoc(docRef);
@@ -92,11 +100,13 @@ function App() {
         
         setNewSentence('');
         setView('home');
-        loadStories();
+        await loadStories();
       }
     } catch (error) {
       console.error('Error adding sentence:', error);
       alert('Error adding sentence. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,25 +136,30 @@ function App() {
         <div className="home">
           <div className="actions">
             <button onClick={() => setView('newStory')} className="primary">
-              Start New Story
+              ✨ Start New Story
             </button>
           </div>
 
           <div className="stories">
             <h2>Active Stories</h2>
-            {stories.length === 0 ? (
-              <p>No stories yet. Start the first one!</p>
+            {loading ? (
+              <div className="loading">Loading stories...</div>
+            ) : stories.length === 0 ? (
+              <div style={{textAlign: 'center', padding: '40px', color: '#6c757d'}}>
+                <p style={{fontSize: '1.2rem', marginBottom: '10px'}}>No stories yet!</p>
+                <p>Be the first to start a collaborative story.</p>
+              </div>
             ) : (
               stories.map(story => (
                 <div key={story.id} className="story-card">
-                  <h3>Story #{story.id.slice(-6)}</h3>
-                  <p>{story.sentences.length} sentences</p>
+                  <h3>📖 Story #{story.id.slice(-6)}</h3>
+                  <p>📝 {story.sentences.length} sentence{story.sentences.length !== 1 ? 's' : ''}</p>
                   <div className="story-actions">
-                    <button onClick={() => selectStory(story.id)}>
-                      Add Sentence
+                    <button onClick={() => selectStory(story.id)} className="primary">
+                      ✍️ Continue Story
                     </button>
                     <button onClick={() => viewFullStory(story.id)}>
-                      Read Full Story
+                      📚 Read Story
                     </button>
                   </div>
                 </div>
@@ -156,51 +171,77 @@ function App() {
 
       {view === 'newStory' && (
         <div className="new-story">
-          <h2>Start a New Story</h2>
+          <h2>✨ Start a New Story</h2>
           <textarea
-            placeholder="Write the opening sentence of your story..."
+            placeholder="Write an intriguing opening sentence that will hook other writers..."
             onChange={(e) => setNewSentence(e.target.value)}
             value={newSentence}
+            disabled={loading}
           />
           <div className="actions">
-            <button onClick={() => startNewStory(newSentence)} className="primary">
-              Start Story
+            <button 
+              onClick={() => startNewStory(newSentence)} 
+              className="primary"
+              disabled={loading || !newSentence.trim()}
+            >
+              {loading ? '🔄 Creating...' : '🚀 Start Story'}
             </button>
-            <button onClick={() => setView('home')}>Cancel</button>
+            <button onClick={() => setView('home')} disabled={loading}>
+              ← Back
+            </button>
           </div>
         </div>
       )}
 
       {view === 'contribute' && (
         <div className="contribute">
-          <h2>Continue the Story</h2>
+          <h2>✍️ Continue the Story</h2>
           <div className="latest-sentence">
-            <h3>Latest sentence:</h3>
+            <h3>💭 Latest sentence:</h3>
             <p>"{latestSentence}"</p>
           </div>
           <textarea
-            placeholder="Write the next sentence..."
+            placeholder="What happens next? Write a sentence that builds on the story..."
             value={newSentence}
             onChange={(e) => setNewSentence(e.target.value)}
+            disabled={loading}
           />
           <div className="actions">
-            <button onClick={addSentence} className="primary">
-              Add Sentence
+            <button 
+              onClick={addSentence} 
+              className="primary"
+              disabled={loading || !newSentence.trim()}
+            >
+              {loading ? '🔄 Adding...' : '📝 Add Sentence'}
             </button>
-            <button onClick={() => setView('home')}>Cancel</button>
+            <button onClick={() => setView('home')} disabled={loading}>
+              ← Back
+            </button>
           </div>
         </div>
       )}
 
       {view === 'fullStory' && fullStory && (
         <div className="full-story">
-          <h2>Story #{fullStory.id.slice(-6)}</h2>
+          <h2>📚 Story #{fullStory.id.slice(-6)}</h2>
           <div className="story-content">
             {fullStory.sentences.map((sentence, index) => (
-              <p key={index}>{sentence}</p>
+              <p key={index}>
+                <span style={{color: '#6c757d', fontSize: '0.9rem', marginRight: '10px'}}>
+                  {index + 1}.
+                </span>
+                {sentence}
+              </p>
             ))}
           </div>
-          <button onClick={() => setView('home')}>Back to Home</button>
+          <div className="actions">
+            <button onClick={() => selectStory(fullStory.id)} className="primary">
+              ✍️ Add to This Story
+            </button>
+            <button onClick={() => setView('home')}>
+              ← Back to Stories
+            </button>
+          </div>
         </div>
       )}
     </div>
