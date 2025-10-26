@@ -4,7 +4,7 @@ A collaborative fiction web app where users write stories together, one sentence
 
 ## 🚀 Live Demo
 
-Visit: [https://yourusername.github.io/story-weaver](https://yourusername.github.io/story-weaver)
+Visit: [https://weaver.sumanthaks.dev](https://weaver.sumanthaks.dev)
 
 ## Features
 
