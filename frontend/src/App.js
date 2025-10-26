@@ -19,6 +19,34 @@ const useLocalStorage = () => {
 
 const { getStories: getLocalStories, saveStories: saveLocalStories } = useLocalStorage();
 
+// Story starter prompts
+const storyStarters = [
+  "The last person on Earth sat alone in a room when suddenly there was a knock at the door.",
+  "She found the old diary in her grandmother's attic, but the entries were dated fifty years in the future.",
+  "The coffee shop appeared overnight, and everyone who entered came out speaking a different language.",
+  "He woke up to find that gravity had stopped working, but only in his house.",
+  "The mirror showed her reflection doing things she wasn't doing.",
+  "Every night at 3:33 AM, the same stranger called asking for someone who didn't exist.",
+  "The library book was due back in 1987, but she had just checked it out yesterday.",
+  "His shadow started walking in the opposite direction.",
+  "The elevator only had buttons for floors that didn't exist in the building.",
+  "She received a text message from her own phone number.",
+  "The street that led to his house disappeared every Tuesday.",
+  "Everyone in town had the same dream last night, except for her.",
+  "The antique music box played a song that wouldn't be written for another century.",
+  "He found a door in his basement that opened to someone else's basement.",
+  "The weather forecast predicted emotions instead of temperatures.",
+  "She discovered that her houseplants had been rearranging themselves when she wasn't looking.",
+  "The new neighbor claimed to be delivering mail to the previous residents who had moved out decades ago.",
+  "Every photo he took showed people who weren't there when he took the picture.",
+  "The GPS kept giving directions to places that only existed in her childhood memories.",
+  "She found a key in her pocket that she'd never seen before, but it unlocked everything."
+];
+
+const getRandomStarter = () => {
+  return storyStarters[Math.floor(Math.random() * storyStarters.length)];
+};
+
 function App() {
   const [view, setView] = useState('home');
   const [stories, setStories] = useState([]);
@@ -291,12 +319,25 @@ function App() {
       {view === 'newStory' && (
         <div className="new-story">
           <h2>✨ Start a New Story</h2>
-          <textarea
-            placeholder="Write an intriguing opening sentence that will hook other writers..."
-            onChange={(e) => setNewSentence(e.target.value)}
-            value={newSentence}
-            disabled={loading}
-          />
+          <div className="story-input-section">
+            <textarea
+              placeholder="Write an intriguing opening sentence that will hook other writers..."
+              onChange={(e) => setNewSentence(e.target.value)}
+              value={newSentence}
+              disabled={loading}
+            />
+            <div className="dice-section">
+              <button 
+                className="dice-button"
+                onClick={() => setNewSentence(getRandomStarter())}
+                disabled={loading}
+                title="Get a random story starter"
+              >
+                🎲
+              </button>
+              <span className="dice-label">Random Starter</span>
+            </div>
+          </div>
           <div className="actions">
             <button 
               onClick={() => startNewStory(newSentence)} 

@@ -128,6 +128,94 @@ header p {
   border: 1px solid rgba(255, 193, 7, 0.3);
 }
 
+.story-input-section {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  margin-bottom: 25px;
+}
+
+.story-input-section textarea {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.dice-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dice-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  padding: 0;
+  margin: 0;
+}
+
+.dice-button:hover {
+  animation: shake 0.5s ease-in-out;
+  transform: scale(1.1);
+}
+
+.dice-button:active {
+  animation: roll 0.6s ease-in-out;
+}
+
+.dice-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+.light-mode .dice-label {
+  color: #6c757d;
+}
+
+.dark-mode .dice-label {
+  color: #bdc1c6;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px) rotate(-5deg); }
+  75% { transform: translateX(5px) rotate(5deg); }
+}
+
+@keyframes roll {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(90deg) scale(1.1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  75% { transform: rotate(270deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@media (max-width: 768px) {
+  .story-input-section {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .dice-section {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
 .actions {
   display: flex;
   gap: 15px;
