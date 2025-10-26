@@ -3,6 +3,22 @@ import './App.css';
 import { db } from './firebase';
 import { collection, addDoc, getDocs, doc, updateDoc, getDoc, orderBy, query } from 'firebase/firestore';
 
+// Fallback to localStorage if Firebase fails
+const useLocalStorage = () => {
+  const getStories = () => {
+    const saved = localStorage.getItem('storyWeaverStories');
+    return saved ? JSON.parse(saved) : [];
+  };
+  
+  const saveStories = (stories) => {
+    localStorage.setItem('storyWeaverStories', JSON.stringify(stories));
+  };
+  
+  return { getStories, saveStories };
+};
+
+const { getStories: getLocalStories, saveStories: saveLocalStories } = useLocalStorage();
+
 function App() {
   const [view, setView] = useState('home');
   const [stories, setStories] = useState([]);
@@ -15,11 +31,25 @@ function App() {
     const saved = localStorage.getItem('darkMode');
     return saved ? JSON.parse(saved) : false;
   });
+  const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
     document.body.className = darkMode ? 'dark-mode' : 'light-mode';
   }, [darkMode]);
+
+  useEffect(() => {
+    // Test Firebase connection
+    const testConnection = async () => {
+      try {
+        await getDocs(query(collection(db, 'stories')));
+        setIsOnline(true);
+      } catch (error) {
+        setIsOnline(false);
+      }
+    };
+    testConnection();
+  }, []);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -32,16 +62,21 @@ function App() {
   const loadStories = async () => {
     try {
       setLoading(true);
+      // Try Firebase first
       const q = query(collection(db, 'stories'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(q);
       const storiesData = [];
       querySnapshot.forEach((doc) => {
         storiesData.push({ id: doc.id, ...doc.data() });
       });
-      console.log('Loaded stories:', storiesData);
+      console.log('Loaded stories from Firebase:', storiesData);
       setStories(storiesData);
     } catch (error) {
-      console.error('Error loading stories:', error);
+      console.error('Firebase error, using localStorage:', error);
+      // Fallback to localStorage
+      const localStories = getLocalStories();
+      console.log('Loaded stories from localStorage:', localStories);
+      setStories(localStories);
     } finally {
       setLoading(false);
     }
@@ -58,12 +93,26 @@ function App() {
     try {
       setLoading(true);
       const newStory = {
+        id: Date.now().toString(),
         sentences: [firstSentence.trim()],
         createdAt: new Date()
       };
       
       console.log('Creating new story:', newStory);
-      await addDoc(collection(db, 'stories'), newStory);
+      
+      try {
+        // Try Firebase first
+        await addDoc(collection(db, 'stories'), newStory);
+        console.log('Story saved to Firebase');
+      } catch (firebaseError) {
+        console.log('Firebase failed, using localStorage:', firebaseError);
+        // Fallback to localStorage
+        const currentStories = getLocalStories();
+        const updatedStories = [newStory, ...currentStories];
+        saveLocalStories(updatedStories);
+        console.log('Story saved to localStorage');
+      }
+      
       setNewSentence('');
       setView('home');
       await loadStories();
@@ -77,11 +126,26 @@ function App() {
 
   const selectStory = async (storyId) => {
     try {
-      const docRef = doc(db, 'stories', storyId);
-      const docSnap = await getDoc(docRef);
+      try {
+        // Try Firebase first
+        const docRef = doc(db, 'stories', storyId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const story = docSnap.data();
+          setCurrentStory(storyId);
+          setLatestSentence(story.sentences[story.sentences.length - 1]);
+          setView('contribute');
+          return;
+        }
+      } catch (firebaseError) {
+        console.log('Firebase failed, checking localStorage:', firebaseError);
+      }
       
-      if (docSnap.exists()) {
-        const story = docSnap.data();
+      // Fallback to localStorage
+      const localStories = getLocalStories();
+      const story = localStories.find(s => s.id === storyId);
+      if (story) {
         setCurrentStory(storyId);
         setLatestSentence(story.sentences[story.sentences.length - 1]);
         setView('contribute');
@@ -100,21 +164,37 @@ function App() {
     try {
       setLoading(true);
       console.log('Adding sentence to story:', currentStory);
-      const docRef = doc(db, 'stories', currentStory);
-      const docSnap = await getDoc(docRef);
       
-      if (docSnap.exists()) {
-        const story = docSnap.data();
-        const updatedSentences = [...story.sentences, newSentence.trim()];
+      try {
+        // Try Firebase first
+        const docRef = doc(db, 'stories', currentStory);
+        const docSnap = await getDoc(docRef);
         
-        await updateDoc(docRef, {
-          sentences: updatedSentences
-        });
-        
-        setNewSentence('');
-        setView('home');
-        await loadStories();
+        if (docSnap.exists()) {
+          const story = docSnap.data();
+          const updatedSentences = [...story.sentences, newSentence.trim()];
+          
+          await updateDoc(docRef, {
+            sentences: updatedSentences
+          });
+          console.log('Sentence added to Firebase');
+        }
+      } catch (firebaseError) {
+        console.log('Firebase failed, using localStorage:', firebaseError);
+        // Fallback to localStorage
+        const localStories = getLocalStories();
+        const updatedStories = localStories.map(story => 
+          story.id === currentStory 
+            ? { ...story, sentences: [...story.sentences, newSentence.trim()] }
+            : story
+        );
+        saveLocalStories(updatedStories);
+        console.log('Sentence added to localStorage');
       }
+      
+      setNewSentence('');
+      setView('home');
+      await loadStories();
     } catch (error) {
       console.error('Error adding sentence:', error);
       alert('Error adding sentence. Please try again.');
@@ -125,11 +205,25 @@ function App() {
 
   const viewFullStory = async (storyId) => {
     try {
-      const docRef = doc(db, 'stories', storyId);
-      const docSnap = await getDoc(docRef);
+      try {
+        // Try Firebase first
+        const docRef = doc(db, 'stories', storyId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+          const story = { id: storyId, ...docSnap.data() };
+          setFullStory(story);
+          setView('fullStory');
+          return;
+        }
+      } catch (firebaseError) {
+        console.log('Firebase failed, checking localStorage:', firebaseError);
+      }
       
-      if (docSnap.exists()) {
-        const story = { id: storyId, ...docSnap.data() };
+      // Fallback to localStorage
+      const localStories = getLocalStories();
+      const story = localStories.find(s => s.id === storyId);
+      if (story) {
         setFullStory(story);
         setView('fullStory');
       }
@@ -145,6 +239,11 @@ function App() {
           <div className="title-section">
             <h1>📖 Story Weaver</h1>
             <p>Collaborative storytelling, one sentence at a time</p>
+            {!isOnline && (
+              <div className="offline-notice">
+                📱 Offline Mode - Stories saved locally
+              </div>
+            )}
           </div>
           <button className="theme-toggle" onClick={toggleDarkMode}>
             {darkMode ? '☀️' : '🌙'}

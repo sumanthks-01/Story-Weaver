@@ -116,6 +116,18 @@ header p {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
+.offline-notice {
+  background: rgba(255, 193, 7, 0.9);
+  color: #856404;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 10px;
+  display: inline-block;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
 .actions {
   display: flex;
   gap: 15px;
