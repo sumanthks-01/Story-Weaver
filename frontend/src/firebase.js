@@ -1,9 +1,6 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
-// Replace with your Firebase config
-// Import the functions you need from the SDKs you need
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyACnbQIHNnb5QFAdTQ02QXkCYi5tf2J9eM",
   authDomain: "story-weaver-fd57d.firebaseapp.com",
@@ -13,6 +10,15 @@ const firebaseConfig = {
   appId: "1:14253655734:web:08465275a9aed953314817"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+let app;
+let db;
+
+try {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  console.log('Firebase initialized successfully');
+} catch (error) {
+  console.error('Firebase initialization failed:', error);
+}
+
+export { db };

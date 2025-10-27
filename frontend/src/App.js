@@ -70,9 +70,22 @@ function App() {
     // Test Firebase connection
     const testConnection = async () => {
       try {
-        await getDocs(query(collection(db, 'stories')));
+        if (!db) {
+          console.log('Firebase not initialized');
+          setIsOnline(false);
+          return;
+        }
+        
+        console.log('Testing Firebase connection...');
+        const testQuery = query(collection(db, 'stories'));
+        await getDocs(testQuery);
+        console.log('Firebase connection successful');
         setIsOnline(true);
       } catch (error) {
+        console.error('Firebase connection failed:', error.code, error.message);
+        if (error.code === 'permission-denied') {
+          console.log('Firestore security rules are blocking access. Using localStorage.');
+        }
         setIsOnline(false);
       }
     };
@@ -270,6 +283,8 @@ function App() {
             {!isOnline && (
               <div className="offline-notice">
                 📱 Offline Mode - Stories saved locally
+                <br />
+                <small>Check console for Firebase connection details</small>
               </div>
             )}
           </div>
