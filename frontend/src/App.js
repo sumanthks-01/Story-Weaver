@@ -283,8 +283,8 @@ export default function App() {
                 style={{ display: 'inline-block', width: '728px', height: '80px' }}
                 data-ad-client="ca-pub-7200157855781527"
                 data-ad-slot="6943770802"
-              />
-              <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
+              ></ins>
+              <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }}></script>
             </div>
           </div>
         )}
