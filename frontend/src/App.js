@@ -56,6 +56,15 @@ function CharCounter({ value, max }) {
   );
 }
 
+const shareStory = (storyId) => {
+  const url = `${window.location.origin}?story=${storyId}`;
+  if (navigator.share) {
+    navigator.share({ title: 'Story Weaver', text: 'Continue this collaborative story!', url });
+  } else {
+    navigator.clipboard.writeText(url);
+  }
+};
+
 export default function App() {
   const [view, setView] = useState('home');
   const [stories, setStories] = useState([]);
@@ -257,6 +266,9 @@ export default function App() {
                         <button className="btn btn-secondary btn-sm" onClick={() => viewFullStory(story.id)}>
                           📚 Read
                         </button>
+                        <button className="btn btn-ghost btn-sm" onClick={() => { shareStory(story.id); showToast('Link copied! 🔗', 'success'); }} title="Share this story">
+                          🔗
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -374,6 +386,9 @@ export default function App() {
             <div className="panel-actions">
               <button className="btn btn-primary" onClick={() => selectStory(fullStory.id)}>
                 ✍️ Add to This Story
+              </button>
+              <button className="btn btn-ghost" onClick={() => { shareStory(fullStory.id); showToast('Link copied! 🔗', 'success'); }}>
+                🔗 Share Story
               </button>
               <button className="btn btn-secondary" onClick={goHome}>
                 ← All Stories
