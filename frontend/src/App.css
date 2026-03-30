@@ -628,13 +628,13 @@ textarea::placeholder { color: var(--text-muted); font-style: italic; }
   margin-top: 8px;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  min-height: 100px;
   background: var(--surface);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 10px 0;
 }
 
 .ad-label {
@@ -643,10 +643,13 @@ textarea::placeholder { color: var(--text-muted); font-style: italic; }
   letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--text-muted);
-  padding: 6px 0 2px;
+  padding-bottom: 6px;
   opacity: .6;
 }
 
-.ad-banner .adsbygoogle {
-  width: 100%;
+@media (max-width: 728px) {
+  .ad-banner ins {
+    width: 100% !important;
+    height: 60px !important;
+  }
 }
