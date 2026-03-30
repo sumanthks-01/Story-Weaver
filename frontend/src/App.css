@@ -17,8 +17,6 @@
 
 /* ── Theme tokens ─────────────────────────────────────────── */
 body.light-mode {
-  --bg:           #f0f2ff;
-  --bg-grad:      linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --surface:      #ffffff;
   --surface-alt:  #f8f9ff;
   --border:       rgba(0,0,0,.08);
@@ -30,8 +28,6 @@ body.light-mode {
 }
 
 body.dark-mode {
-  --bg:           #0f0f1a;
-  --bg-grad:      linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
   --surface:      #1e1e30;
   --surface-alt:  #16162a;
   --border:       rgba(255,255,255,.08);
@@ -42,12 +38,34 @@ body.dark-mode {
   --prompt-border:rgba(102,126,234,.35);
 }
 
+/* ── Background pattern ───────────────────────────────────── */
+body.dark-mode {
+  background:
+    radial-gradient(circle farthest-side at 0% 50%, #282828 23.5%, rgba(255,170,0,0) 0) 21px 30px,
+    radial-gradient(circle farthest-side at 0% 50%, #2c3539 24%,   rgba(240,166,17,0) 0) 19px 30px,
+    linear-gradient(#282828 14%, rgba(240,166,17,0) 0, rgba(240,166,17,0) 85%, #282828 0) 0 0,
+    linear-gradient(150deg, #282828 24%, #2c3539 0, #2c3539 26%, rgba(240,166,17,0) 0, rgba(240,166,17,0) 74%, #2c3539 0, #2c3539 76%, #282828 0) 0 0,
+    linear-gradient(30deg,  #282828 24%, #2c3539 0, #2c3539 26%, rgba(240,166,17,0) 0, rgba(240,166,17,0) 74%, #2c3539 0, #2c3539 76%, #282828 0) 0 0,
+    linear-gradient(90deg, #2c3539 2%, #282828 0, #282828 98%, #2c3539 0%) 0 0 #282828;
+  background-size: 40px 60px;
+}
+
+body.light-mode {
+  background:
+    radial-gradient(circle farthest-side at 0% 50%, #dde1f0 23.5%, rgba(255,255,255,0) 0) 21px 30px,
+    radial-gradient(circle farthest-side at 0% 50%, #e8ecf8 24%,   rgba(255,255,255,0) 0) 19px 30px,
+    linear-gradient(#dde1f0 14%, rgba(255,255,255,0) 0, rgba(255,255,255,0) 85%, #dde1f0 0) 0 0,
+    linear-gradient(150deg, #dde1f0 24%, #e8ecf8 0, #e8ecf8 26%, rgba(255,255,255,0) 0, rgba(255,255,255,0) 74%, #e8ecf8 0, #e8ecf8 76%, #dde1f0 0) 0 0,
+    linear-gradient(30deg,  #dde1f0 24%, #e8ecf8 0, #e8ecf8 26%, rgba(255,255,255,0) 0, rgba(255,255,255,0) 74%, #e8ecf8 0, #e8ecf8 76%, #dde1f0 0) 0 0,
+    linear-gradient(90deg, #e8ecf8 2%, #dde1f0 0, #dde1f0 98%, #e8ecf8 0%) 0 0 #dde1f0;
+  background-size: 40px 60px;
+}
+
 body {
   font-family: var(--font);
-  background: var(--bg-grad);
   color: var(--text);
   min-height: 100vh;
-  transition: background var(--transition), color var(--transition);
+  transition: color var(--transition);
 }
 
 /* ── Layout ───────────────────────────────────────────────── */
@@ -118,20 +136,140 @@ header {
   border-color: rgba(252,211,77,.3);
 }
 
-.theme-toggle {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  background: var(--surface-alt);
-  font-size: 1.2rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform var(--transition), box-shadow var(--transition);
+/* ── Theme toggle switch ──────────────────────────────────── */
+.toggle-cont {
+  --primary: #54a8fc;
+  --light:   #d9d9d9;
+  --dark:    #121212;
+  --gray:    #414344;
+
+  position: relative;
+  z-index: 10;
+  width: fit-content;
+  height: 50px;
+  border-radius: 9999px;
 }
-.theme-toggle:hover { transform: scale(1.1); box-shadow: var(--shadow-sm); }
+
+.toggle-cont .toggle-input { display: none; }
+
+.toggle-cont .toggle-label {
+  --gap:   5px;
+  --width: 50px;
+
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem;
+  width: calc((var(--width) + var(--gap)) * 2);
+  height: 100%;
+  background-color: var(--dark);
+  border: 1px solid #777;
+  border-bottom: 0;
+  border-radius: 9999px;
+  box-sizing: content-box;
+  transition: all 0.3s ease-in-out;
+}
+
+.toggle-label::before {
+  content: "";
+  position: absolute;
+  z-index: -10;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% + 1.5rem);
+  height: calc(100% + 1.5rem);
+  background-color: var(--gray);
+  border: 1px solid #777;
+  border-bottom: 0;
+  border-radius: 9999px;
+  transition: all 0.3s ease-in-out;
+}
+
+.toggle-label::after {
+  content: "";
+  position: absolute;
+  z-index: -10;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%; height: 100%;
+  background-image: radial-gradient(circle at 50% -100%, rgb(58,155,252) 0%, rgba(12,12,12,1) 80%);
+  border-radius: 9999px;
+}
+
+.toggle-cont .toggle-label .cont-icon {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: var(--width);
+  height: 50px;
+  background-image: radial-gradient(circle at 50% 0%, #666 0%, var(--gray) 100%);
+  border: 1px solid #aaa;
+  border-bottom: 0;
+  border-radius: 9999px;
+  box-shadow: inset 0 -0.15rem 0.15rem var(--primary);
+  transition: transform 0.3s ease-in-out;
+  overflow: clip;
+}
+
+.cont-icon .sparkle {
+  position: absolute;
+  top: 50%; left: 50%;
+  display: block;
+  width: calc(var(--width) * 1px);
+  aspect-ratio: 1;
+  background-color: var(--light);
+  border-radius: 50%;
+  transform-origin: 50% 50%;
+  rotate: calc(1deg * var(--deg));
+  transform: translate(-50%, -50%);
+  animation: sparkle-anim calc(100s / var(--duration)) linear calc(0s / var(--duration)) infinite;
+}
+
+@keyframes sparkle-anim {
+  to {
+    width: calc(var(--width) * 0.5px);
+    transform: translate(2000%, -50%);
+  }
+}
+
+.cont-icon .toggle-icon {
+  width: 1.1rem;
+  fill: var(--light);
+}
+
+/* checked state */
+.toggle-cont:has(.toggle-input:checked) .toggle-label {
+  background-color: transparent;
+  border: 1px solid #3d6970;
+  border-bottom: 0;
+}
+
+.toggle-cont:has(.toggle-input:checked) .toggle-label::before {
+  box-shadow: 0 1rem 2.5rem -2rem #0080ff;
+}
+
+.toggle-cont:has(.toggle-input:checked) .toggle-label .cont-icon {
+  overflow: visible;
+  background-image: radial-gradient(circle at 50% 0%, #045ab1 0%, var(--primary) 100%);
+  border: 1px solid var(--primary);
+  border-bottom: 0;
+  transform: translateX(calc((var(--gap) * 2) + 100%)) rotate(-225deg);
+}
+
+.toggle-cont:has(.toggle-input:checked) .cont-icon .sparkle {
+  z-index: -10;
+  width: calc(var(--width) * 1.5px);
+  background-color: #acacac;
+  animation: sparkle-checked calc(100s / var(--duration)) linear calc(10s / var(--duration)) infinite;
+}
+
+@keyframes sparkle-checked {
+  to {
+    width: calc(var(--width) * 1px);
+    transform: translate(5000%, -50%);
+  }
+}
 
 /* ── Buttons ──────────────────────────────────────────────── */
 .btn {

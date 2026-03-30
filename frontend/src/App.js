@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
+import ThemeToggle from './ThemeToggle';
 import { db } from './firebase';
 import { collection, addDoc, getDocs, doc, updateDoc, getDoc, orderBy, query, serverTimestamp } from 'firebase/firestore';
 
@@ -200,9 +201,7 @@ export default function App() {
           </div>
           <div className="header-right">
             {!isOnline && <span className="offline-badge">📴 Offline</span>}
-            <button className="theme-toggle" onClick={() => setDarkMode(d => !d)} aria-label="Toggle theme">
-              {darkMode ? '☀️' : '🌙'}
-            </button>
+            <ThemeToggle darkMode={darkMode} onToggle={() => setDarkMode(d => !d)} />
           </div>
         </div>
       </header>
