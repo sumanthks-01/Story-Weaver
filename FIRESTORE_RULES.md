@@ -1,54 +1,42 @@
-# Firestore Security Rules Setup
+# Firestore Security Rules
 
-Your Firebase project needs proper security rules to allow read/write access. 
+## Production Rules (Recommended)
 
-## Current Issue
-The app shows "Offline Mode" because Firestore security rules are blocking access.
-
-## Fix: Update Firestore Rules
-
-1. **Go to Firebase Console**: https://console.firebase.google.com/
-2. **Select your project**: story-weaver-fd57d
-3. **Go to Firestore Database**
-4. **Click "Rules" tab**
-5. **Replace the rules with:**
+Go to Firebase Console → your project → Firestore Database → Rules tab, and publish:
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write access to stories collection
-    match /stories/{document} {
-      allow read, write: if true;
+    match /stories/{storyId} {
+      // Anyone can read stories
+      allow read: if true;
+
+      // Create: must have exactly 1 sentence, max 500 chars
+      allow create: if request.resource.data.sentences is list
+                    && request.resource.data.sentences.size() == 1
+                    && request.resource.data.sentences[0] is string
+                    && request.resource.data.sentences[0].size() <= 500;
+
+      // Update: sentences list only grows, max 200 sentences, each max 500 chars
+      allow update: if request.resource.data.sentences is list
+                    && request.resource.data.sentences.size() > resource.data.sentences.size()
+                    && request.resource.data.sentences.size() <= 200;
     }
   }
 }
 ```
 
-6. **Click "Publish"**
+## What These Rules Do
 
-## Alternative: Test Mode Rules (30 days)
+- **Read**: Public — anyone can browse stories
+- **Create**: Enforces a single opening sentence with a 500-character limit
+- **Update**: Only allows appending sentences (list can only grow), capped at 200 sentences per story
+- **Delete**: Blocked — no one can delete stories via the client
 
-For quick testing, use these rules (expires in 30 days):
+## What to Avoid
 
 ```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2024, 12, 31);
-    }
-  }
-}
+// ❌ NEVER use this in production — gives anyone full database access
+allow read, write: if true;
 ```
-
-## Verify Fix
-
-After updating rules:
-1. Refresh your Story Weaver app
-2. The "Offline Mode" notice should disappear
-3. Stories will sync across all users in real-time
-
-## Security Note
-
-The rules above allow anyone to read/write. For production, consider adding authentication and user-specific rules.

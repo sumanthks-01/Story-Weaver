@@ -8,12 +8,24 @@ yarn-error.log*
 /frontend/build
 /backend/dist
 
-# Environment variables
+# Environment variables — NEVER commit these
 .env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production
+frontend/.env.production.local
+backend/.env
+backend/.env.local
 
 # IDE
 .vscode/
@@ -24,5 +36,5 @@ yarn-error.log*
 Thumbs.db
 
 # Logs
-logs
+logs/
 *.log

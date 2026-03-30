@@ -1,24 +1,34 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyACnbQIHNnb5QFAdTQ02QXkCYi5tf2J9eM",
-  authDomain: "story-weaver-fd57d.firebaseapp.com",
-  projectId: "story-weaver-fd57d",
-  storageBucket: "story-weaver-fd57d.firebasestorage.app",
-  messagingSenderId: "14253655734",
-  appId: "1:14253655734:web:08465275a9aed953314817"
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
-let app;
 let db;
 
-try {
-  app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-  console.log('Firebase initialized successfully');
-} catch (error) {
-  console.error('Firebase initialization failed:', error);
+const requiredKeys = [
+  'REACT_APP_FIREBASE_API_KEY',
+  'REACT_APP_FIREBASE_PROJECT_ID',
+  'REACT_APP_FIREBASE_APP_ID'
+];
+
+const missingKeys = requiredKeys.filter(key => !process.env[key]);
+
+if (missingKeys.length === 0) {
+  try {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+  } catch (error) {
+    console.error('Firebase initialization failed.');
+  }
+} else {
+  console.warn('Firebase env vars not set. Running in offline mode.');
 }
 
 export { db };

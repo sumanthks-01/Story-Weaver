@@ -1,50 +1,54 @@
 # Firebase Setup Guide
 
-## 1. Create Firebase Project
+## 1. Create a Firebase Project
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Click "Create a project"
-3. Name it "story-weaver" (or any name)
-4. Disable Google Analytics (not needed)
-5. Click "Create project"
+2. Click "Create a project", name it, disable Google Analytics
+3. Click "Create project"
 
-## 2. Setup Firestore Database
+## 2. Enable Firestore
 
-1. In your Firebase project, click "Firestore Database"
-2. Click "Create database"
-3. Choose "Start in test mode" (allows read/write for 30 days)
-4. Select a location (choose closest to your users)
-5. Click "Done"
+1. In your project, click "Firestore Database" → "Create database"
+2. Choose **production mode** (not test mode)
+3. Select a region close to your users → "Done"
+4. Set security rules — see [FIRESTORE_RULES.md](./FIRESTORE_RULES.md)
 
-## 3. Get Firebase Config
+## 3. Get Your Config Values
 
 1. Click the gear icon → "Project settings"
-2. Scroll down to "Your apps"
-3. Click the web icon `</>`
-4. Register app with nickname "story-weaver-web"
-5. Copy the `firebaseConfig` object
+2. Scroll to "Your apps" → click the web icon `</>`
+3. Register the app with a nickname (e.g. `story-weaver-web`)
+4. Copy the values from the `firebaseConfig` object shown
 
-## 4. Update Your App
+> Never share or commit these values — treat them like passwords.
 
-Replace the config in `frontend/src/firebase.js`:
+## 4. Set Environment Variables
 
-```javascript
-const firebaseConfig = {
-  // Paste your actual config here
-  apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "your-app-id"
-};
+```bash
+cd frontend
+cp .env.example .env.local
 ```
 
-## 5. Deploy
+Open `frontend/.env.local` and fill in each value from step 3:
+
+```
+REACT_APP_FIREBASE_API_KEY=<your apiKey>
+REACT_APP_FIREBASE_AUTH_DOMAIN=<your authDomain>
+REACT_APP_FIREBASE_PROJECT_ID=<your projectId>
+REACT_APP_FIREBASE_STORAGE_BUCKET=<your storageBucket>
+REACT_APP_FIREBASE_MESSAGING_SENDER_ID=<your messagingSenderId>
+REACT_APP_FIREBASE_APP_ID=<your appId>
+```
+
+> `.env.local` is listed in `.gitignore` — it will never be committed to version control.
+
+## 5. Run the App
 
 ```bash
 npm run install-all
-npm run deploy
+npm run dev
 ```
 
-Your app will now use Firebase for real-time collaborative storage!
+## Deploying (GitHub Pages / CI)
+
+Do **not** put real credentials in any committed file. Instead, add each `REACT_APP_*` variable as a secret in your CI environment (e.g. GitHub Actions → Settings → Secrets) and inject them at build time.
