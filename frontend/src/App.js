@@ -263,6 +263,19 @@ export default function App() {
                 </div>
               )}
             </section>
+
+            <div className="ad-banner">
+              <p className="ad-label">Advertisement</p>
+              <ins
+                className="adsbygoogle"
+                style={{ display: 'block' }}
+                data-ad-client="ca-pub-7200157855781527"
+                data-ad-slot="XXXXXXXXXX"
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+              />
+              <script dangerouslySetInnerHTML={{ __html: '(adsbygoogle = window.adsbygoogle || []).push({});' }} />
+            </div>
           </div>
         )}
 
