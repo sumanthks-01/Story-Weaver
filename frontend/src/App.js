@@ -19,6 +19,16 @@ const getSavedUser = () => {
   catch { return null; }
 };
 
+// Generate or retrieve a persistent sw-prefixed user ID
+const getOrCreateSwId = (uid) => {
+  const storageKey = `swId_${uid || 'anon'}`;
+  const existing = localStorage.getItem(storageKey);
+  if (existing) return existing;
+  const newId = 'sw' + Math.floor(10000 + Math.random() * 90000);
+  localStorage.setItem(storageKey, newId);
+  return newId;
+};
+
 const getRandomStarter = () => {
   const starters = [
     "The last person on Earth sat alone in a room when suddenly there was a knock at the door.",
@@ -106,6 +116,7 @@ export default function App() {
         await setDoc(userDocRef, {
           email: userData.email,
           name: userData.name,
+          swId: userData.swId,
           provider: userData.provider || 'email',
           lastLoginAt: new Date().toISOString()
         }, { merge: true });
@@ -119,10 +130,12 @@ export default function App() {
     if (auth) {
       const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
         if (fbUser) {
+          const swId = getOrCreateSwId(fbUser.uid);
           const userData = {
             uid: fbUser.uid,
             email: fbUser.email,
             name: fbUser.displayName || fbUser.email.split('@')[0],
+            swId,
             provider: fbUser.providerData[0]?.providerId || 'firebase'
           };
           setUser(userData);
@@ -190,9 +203,9 @@ export default function App() {
 
   const getUserHandle = (u) => {
     if (!u) return 'anon';
-    if (u.email) return u.email.split('@')[0];
-    if (u.uid) return u.uid.slice(0, 8);
-    return 'user';
+    if (u.swId) return u.swId;
+    // Fallback: generate one on the fly from uid and cache it
+    return getOrCreateSwId(u.uid || u.email || 'anon');
   };
 
   // Returns stories the current user has contributed to
@@ -200,8 +213,7 @@ export default function App() {
     if (!user) return [];
     const handle = getUserHandle(user);
     return stories.filter(story =>
-      (story.authorIds || []).includes(handle) ||
-      (story.authors || []).includes(user.name)
+      (story.authorIds || []).includes(handle)
     );
   };
 
@@ -214,11 +226,9 @@ export default function App() {
 
     setLoading(true);
     try {
-      const author = user ? user.name : 'Anonymous';
       const authorId = getUserHandle(user);
       const story = {
         sentences: [trimmed],
-        authors: [author],
         authorIds: [authorId],
         createdAt: serverTimestamp()
       };
@@ -267,18 +277,15 @@ export default function App() {
 
     setLoading(true);
     try {
-      const author = user ? user.name : 'Anonymous';
       const authorId = getUserHandle(user);
       try {
         const docRef = doc(db, 'stories', currentStory);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const existingData = docSnap.data();
-          const existingAuthors = existingData.authors || [];
           const existingAuthorIds = existingData.authorIds || [];
           await updateDoc(docRef, {
             sentences: [...existingData.sentences, trimmed],
-            authors: [...existingAuthors, author],
             authorIds: [...existingAuthorIds, authorId]
           });
         }
@@ -288,7 +295,6 @@ export default function App() {
             s.id === currentStory ? {
               ...s,
               sentences: [...s.sentences, trimmed],
-              authors: [...(s.authors || []), author],
               authorIds: [...(s.authorIds || []), authorId]
             } : s
           )
@@ -556,8 +562,8 @@ export default function App() {
               </div>
               <div className="full-story-meta">
                 {fullStory.sentences.length} sentences
-                {fullStory.authors && fullStory.authors.length > 0 && (
-                  <span className="meta-authors">• Authors: {Array.from(new Set(fullStory.authors)).join(', ')}</span>
+                {fullStory.authorIds && fullStory.authorIds.length > 0 && (
+                  <span className="meta-authors">• Contributors: {Array.from(new Set(fullStory.authorIds)).join(', ')}</span>
                 )}
               </div>
               <div className="story-scroll">
@@ -566,14 +572,9 @@ export default function App() {
                     <span className="line-num">{i + 1}</span>
                     <div className="line-content">
                       <p>{sentence}</p>
-                      <div className="line-meta">
-                        {fullStory.authors && fullStory.authors[i] && (
-                          <span className="line-author">— {fullStory.authors[i]}</span>
-                        )}
-                        {fullStory.authorIds && fullStory.authorIds[i] && (
-                          <span className="line-author-id">@{fullStory.authorIds[i]}</span>
-                        )}
-                      </div>
+                      {fullStory.authorIds && fullStory.authorIds[i] && (
+                        <span className="line-author-id">@{fullStory.authorIds[i]}</span>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -8,6 +8,16 @@ import {
   sendPasswordResetEmail
 } from './firebase';
 
+// Generate or retrieve a persistent sw-prefixed ID for this user
+const getOrCreateSwId = (uid) => {
+  const storageKey = `swId_${uid || 'anon'}`;
+  const existing = localStorage.getItem(storageKey);
+  if (existing) return existing;
+  const newId = 'sw' + Math.floor(10000 + Math.random() * 90000);
+  localStorage.setItem(storageKey, newId);
+  return newId;
+};
+
 export default function LoginPage({ onLogin, showToast }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -33,6 +43,7 @@ export default function LoginPage({ onLogin, showToast }) {
             uid: userCred.user.uid,
             email: userCred.user.email,
             name: name.trim() || userCred.user.email.split('@')[0],
+            swId: getOrCreateSwId(userCred.user.uid),
             provider: 'email'
           };
           showToast(`Account created! Welcome, ${user.name}`, 'success');
@@ -43,6 +54,7 @@ export default function LoginPage({ onLogin, showToast }) {
             uid: userCred.user.uid,
             email: userCred.user.email,
             name: userCred.user.displayName || userCred.user.email.split('@')[0],
+            swId: getOrCreateSwId(userCred.user.uid),
             provider: 'email'
           };
           showToast(`Welcome back, ${user.name}!`, 'success');
@@ -53,6 +65,7 @@ export default function LoginPage({ onLogin, showToast }) {
         const user = {
           email: cleanEmail,
           name: name.trim() || cleanEmail.split('@')[0],
+          swId: getOrCreateSwId(cleanEmail),
           provider: 'email'
         };
         showToast(`Welcome back, ${user.name}!`, 'success');
@@ -94,12 +107,13 @@ export default function LoginPage({ onLogin, showToast }) {
           uid: result.user.uid,
           email: result.user.email,
           name: result.user.displayName || 'Google User',
+          swId: getOrCreateSwId(result.user.uid),
           provider: 'google'
         };
         showToast(`Signed in as ${user.name}!`, 'success');
         onLogin(user);
       } else {
-        const user = { email: 'google.user@example.com', name: 'Google User', provider: 'google' };
+        const user = { email: 'google.user@example.com', name: 'Google User', swId: getOrCreateSwId('google-demo'), provider: 'google' };
         showToast('Signed in with Google!', 'success');
         onLogin(user);
       }
@@ -112,7 +126,7 @@ export default function LoginPage({ onLogin, showToast }) {
   };
 
   const handleAppleLogin = () => {
-    const user = { email: 'apple.user@example.com', name: 'Apple User', provider: 'apple' };
+    const user = { email: 'apple.user@example.com', name: 'Apple User', swId: getOrCreateSwId('apple-demo'), provider: 'apple' };
     showToast('Signed in with Apple!', 'success');
     onLogin(user);
   };
