@@ -11,8 +11,9 @@ const MAX_STORIES = 1000;
 app.use(cors({ origin: ALLOWED_ORIGIN }));
 app.use(express.json({ limit: '10kb' }));
 
-// In-memory storage
+// In-memory tables / storage
 let stories = {};
+let users = {};
 let storyCounter = 1;
 
 const validateSentence = (sentence) => {
@@ -23,9 +24,31 @@ const validateSentence = (sentence) => {
   return null;
 };
 
+// Auth / User Tables API
+app.post('/api/auth/login', (req, res) => {
+  const { email, password, name } = req.body;
+  if (!email || !email.trim()) return res.status(400).json({ error: 'Email is required' });
+  
+  const userId = email.toLowerCase().trim();
+  if (!users[userId]) {
+    users[userId] = {
+      id: userId,
+      email: userId,
+      name: name || userId.split('@')[0],
+      createdAt: new Date()
+    };
+  }
+  
+  res.json({ user: users[userId], message: 'Login successful' });
+});
+
+app.get('/api/users', (req, res) => {
+  res.json(Object.values(users));
+});
+
 // Start a new story
 app.post('/api/stories/new', (req, res) => {
-  const { firstSentence } = req.body;
+  const { firstSentence, author } = req.body;
   const error = validateSentence(firstSentence);
   if (error) return res.status(400).json({ error });
 
@@ -37,6 +60,7 @@ app.post('/api/stories/new', (req, res) => {
   stories[storyId] = {
     id: storyId,
     sentences: [firstSentence.trim()],
+    authors: [author || 'Anonymous'],
     createdAt: new Date()
   };
 

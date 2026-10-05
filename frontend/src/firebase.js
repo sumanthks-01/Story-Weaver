@@ -1,5 +1,15 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut,
+  onAuthStateChanged
+} from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -10,7 +20,9 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
-let db;
+let db = null;
+let auth = null;
+let googleProvider = null;
 
 const requiredKeys = [
   'REACT_APP_FIREBASE_API_KEY',
@@ -24,11 +36,23 @@ if (missingKeys.length === 0) {
   try {
     const app = initializeApp(firebaseConfig);
     db = getFirestore(app);
+    auth = getAuth(app);
+    googleProvider = new GoogleAuthProvider();
   } catch (error) {
-    console.error('Firebase initialization failed.');
+    console.error('Firebase initialization failed:', error);
   }
 } else {
-  console.warn('Firebase env vars not set. Running in offline mode.');
+  console.warn('Firebase env vars not set. Running in offline/demo mode.');
 }
 
-export { db };
+export {
+  db,
+  auth,
+  googleProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  signOut,
+  onAuthStateChanged
+};
