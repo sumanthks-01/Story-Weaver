@@ -29,29 +29,96 @@ const getOrCreateSwId = (uid) => {
   return newId;
 };
 
+const _usedStarterIndices = new Set();
+
 const getRandomStarter = () => {
   const starters = [
-    "The last person on Earth sat alone in a room when suddenly there was a knock at the door.",
-    "She found the old diary in her grandmother's attic, but the entries were dated fifty years in the future.",
-    "The coffee shop appeared overnight, and everyone who entered came out speaking a different language.",
-    "He woke up to find that gravity had stopped working, but only in his house.",
-    "The mirror showed her reflection doing things she wasn't doing.",
-    "Every night at 3:33 AM, the same stranger called asking for someone who didn't exist.",
-    "The library book was due back in 1987, but she had just checked it out yesterday.",
-    "His shadow started walking in the opposite direction.",
-    "The elevator only had buttons for floors that didn't exist in the building.",
-    "She received a text message from her own phone number.",
-    "The street that led to his house disappeared every Tuesday.",
-    "Everyone in town had the same dream last night, except for her.",
-    "The antique music box played a song that wouldn't be written for another century.",
-    "He found a door in his basement that opened to someone else's basement.",
-    "The weather forecast predicted emotions instead of temperatures.",
-    "She discovered that her houseplants had been rearranging themselves when she wasn't looking.",
-    "Every photo he took showed people who weren't there when he took the picture.",
-    "The GPS kept giving directions to places that only existed in her childhood memories.",
-    "She found a key in her pocket that she'd never seen before, but it unlocked everything.",
+    // ── Mystery & Thriller ──────────────────────────────────────
+    "The detective had solved 247 cases — but none of them had started with a victim who was still breathing when she arrived.",
+    "On the morning of her retirement, Officer Lena Park received a letter sealed with her own fingerprint.",
+    "The town of Hollow Creek had not reported a single crime in thirty years — until the mayor went missing the night of the centennial celebration.",
+    "Marcus didn't believe in ghosts until the voicemail from his dead sister arrived at 3:47 AM.",
+    "She'd been hired to find a missing painting, but the moment she stepped into the gallery, she realized the painting had found her.",
+    "The only witness to the crime was a seven-year-old who insisted the killer had no shadow.",
+    "Every door in the abandoned hotel was locked from the inside.",
+    "The ransom note was written in a language no linguist had ever seen — yet somehow, Elena could read every word.",
+
+    // ── Science Fiction ─────────────────────────────────────────
+    "Earth received its first alien transmission on a Tuesday, and it was a complaint.",
+    "In 2187, memories could be bought and sold at a weekly market on the corner of Fifth and Bloom.",
+    "The colony ship had been traveling for forty years when the navigation system announced they were already home.",
+    "Dr. Yuen's time machine worked perfectly — the problem was it only moved backward by exactly one minute.",
+    "The last human on a planet of androids had one rule: never let them know you dream.",
+    "When the government outlawed sleep, Nora became the most wanted criminal alive — and the most well-rested.",
+    "The stars had been going out one by one for a decade, and tonight it was our sun's turn.",
+    "She was the first person cloned from a historical figure — and Mary Shelley had opinions about the modern world.",
+
+    // ── Fantasy & Adventure ─────────────────────────────────────
+    "The map ended at the edge of the known world, but someone had drawn a single road beyond it in fresh ink.",
+    "On the night of her sixteenth birthday, Aria discovered that every fairy tale her grandmother had told her was a warning.",
+    "The dragon hadn't breathed fire in a century — not since it had learned to read.",
+    "Every wish the old well granted came true, but only for someone other than the person who'd made it.",
+    "The war had ended two hundred years ago, but the enchanted forest was still fighting it.",
+    "He pulled a sword from a stone — the problem was it was the wrong sword, and now its owner wanted it back.",
+    "The kingdom's most powerful wizard was also its most notorious liar, and today he was telling the truth.",
+    "She'd trained her whole life to slay the beast, and now that she stood before it, she realized she recognized its eyes.",
+
+    // ── Romance & Drama ─────────────────────────────────────────
+    "They met every Tuesday in the same coffee shop for three years before either of them admitted they'd been there on purpose.",
+    "The night before her wedding, Clara found a love letter in her dress pocket — and it wasn't from her fiancé.",
+    "He had exactly one hour to stop a funeral that everyone else believed was necessary.",
+    "She'd sworn off love after the incident in Paris, but nobody had warned her about the bookshop in Dublin.",
+    "The rival families had feuded for generations, and their children had just accidentally fallen in love at the same support group.",
+    "She returned to her hometown for the first time in ten years and found a stranger living in her childhood bedroom — her own name carved above the door.",
+
+    // ── Horror & Suspense ───────────────────────────────────────
+    "The new neighbors moved in on a Sunday, and by Monday, every dog on the street had stopped barking.",
+    "The cabin looked abandoned, but the firewood on the porch had been stacked that morning.",
+    "She'd lived in the house for a year before she noticed the basement door that wasn't on any blueprint.",
+    "The children's laughter coming from the old playground was strange — the playground had been demolished in 1994.",
+    "He'd been warned not to read the last page of the book first — but of course, he had.",
+    "The small coastal town had a beautiful lighthouse with one problem: the light always pointed inland.",
+
+    // ── Historical & Literary ───────────────────────────────────
+    "In the summer of 1912, a young woman booked passage on a ship everyone told her was unsinkable, because she intended to make it sink.",
+    "The emperor's food taster was the only person in the palace who knew the truth — and she was running out of time to tell it.",
+    "He survived the Great War only to discover that everything he'd been fighting for had changed while he was away.",
+    "The letter had traveled across four continents and two world wars to deliver a single, devastating sentence.",
+
+    // ── Quirky & Whimsical ──────────────────────────────────────
+    "The bakery at the end of Fern Street sold one item: a pie that tasted exactly like your happiest memory.",
+    "The city's most beloved librarian had one secret: she had read every book ever written, and she remembered all of them.",
+    "The inventor's greatest creation wasn't a machine — it was a color no one had ever seen before.",
+    "Every person in the village of Thistlewick was born knowing one thing they were absolutely never supposed to know.",
+    "The talking cat at the shelter had been passed over for adoption forty-three times — not because nobody wanted her, but because her references were too good.",
+    "He'd built a machine to find the meaning of life and it had given him a receipt.",
+
+    // ── Coming-of-Age ───────────────────────────────────────────
+    "It was the summer nothing was supposed to change, which is exactly when everything did.",
+    "She'd kept the secret for twelve years — but now that she was eighteen, she was finally allowed to ask the question.",
+    "The first day of senior year, he arrived at school with a new name, a new jacket, and a plan that was already falling apart.",
+    "They'd been best friends since kindergarten, and tonight one of them would have to choose.",
+
+    // ── Psychological ───────────────────────────────────────────
+    "Dr. Reeves had treated hundreds of patients who believed they were living in a simulation — until the day the code appeared in her own handwriting.",
+    "The therapist's newest client had no memories before last Thursday and an unusually detailed knowledge of everyone in the waiting room.",
+    "She'd been writing in her journal every night for a year; this morning, she found entries she had no memory of writing.",
+    "The trial lasted three weeks, and by the end, no one in the courtroom — including the defendant — was certain of the truth.",
   ];
-  return starters[Math.floor(Math.random() * starters.length)];
+
+  // Avoid immediate repeats
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * starters.length);
+  } while (starters.length > 1 && _usedStarterIndices.has(idx));
+
+  // Keep only the last 8 used to allow cycling through the full list
+  _usedStarterIndices.add(idx);
+  if (_usedStarterIndices.size > 8) {
+    _usedStarterIndices.delete(_usedStarterIndices.values().next().value);
+  }
+
+  return starters[idx];
 };
 
 function Toast({ message, type, onClose }) {
