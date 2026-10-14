@@ -93,7 +93,7 @@ export default function App() {
   const [isOnline, setIsOnline] = useState(true);
   const [user, setUser] = useState(getSavedUser);
   const [darkMode, setDarkMode] = useState(
-    () => JSON.parse(localStorage.getItem('darkMode') ?? 'true')
+    () => JSON.parse(localStorage.getItem('darkMode') ?? 'false')
   );
 
   const mainSectionRef = useRef(null);
@@ -363,8 +363,16 @@ export default function App() {
         <header>
           <div className="header-content">
             <div className="title-section">
-              <h1>📖 Story Weaver</h1>
-              <p>Collaborative storytelling, one sentence at a time</p>
+              <h1>
+                <span className="title-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                  </svg>
+                </span>
+                Story Weaver
+              </h1>
+              <p>Collaborative storytelling, <span className="highlight-wash">one sentence at a time</span></p>
             </div>
             <div className="header-right">
               {user && (
@@ -391,7 +399,12 @@ export default function App() {
 
         {!user ? (
           <div className="state-box locked-state-box">
-            <div className="empty-icon lock-icon"></div>
+            <div className="empty-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{color:'var(--text-muted)'}}>
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
             <h3>Authentication Required</h3>
             <p>You must sign in above to view, read, or write stories.</p>
             <button className="btn btn-primary" onClick={() => loginSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}>
@@ -423,9 +436,16 @@ export default function App() {
                   </div>
                 ) : stories.length === 0 ? (
                   <div className="state-box empty-state">
-                    <div className="empty-icon"></div>
+                    <div className="empty-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{color:'var(--text-muted)'}}>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="12" y1="18" x2="12" y2="12" />
+                        <line x1="9" y1="15" x2="15" y2="15" />
+                      </svg>
+                    </div>
                     <h3>No stories yet</h3>
-                    <p>Be the first to start a collaborative story.</p>
+                    <p>Be the first to start a <span className="highlight-wash">collaborative story</span>.</p>
                     <button className="btn btn-primary" onClick={() => setView('newStory')}>
                       Start the first story
                     </button>
@@ -640,7 +660,13 @@ export default function App() {
                 </div>
                 {myStories.length === 0 ? (
                   <div className="state-box empty-state">
-                    <div className="empty-icon"></div>
+                    <div className="empty-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{color:'var(--text-muted)'}}>
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                      </svg>
+                    </div>
                     <h3>No contributions yet</h3>
                     <p>Start or add to a story to see it here.</p>
                     <button className="btn btn-primary" onClick={goHome}>Browse Stories</button>
